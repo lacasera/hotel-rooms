@@ -1,0 +1,64 @@
+version: "3.8"
+services:
+  trivago_api:
+    build:
+      args:
+        user: trivago_api_user
+        uid: 1000
+      context: .
+      dockerfile: Dockerfile
+    container_name: trivago_api
+    restart: unless-stopped
+    tty: true
+    environment:
+      SERVICE_NAME: trivago_api
+      SERVICE_TAGS: dev
+    working_dir: /var/www
+    networks:
+      - trivago_backend     
+    depends_on:
+      - trivago_db
+    
+  trivago_server:
+    image: nginx:alpine
+    container_name: trivago_server
+    restart: unless-stopped
+    tty: true
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+    ports:
+      - "9002:80"
+    networks:
+      - trivago_backend
+
+  trivago_db:
+    image: mysql:5.7.22
+    container_name: trivago_db
+    restart: unless-stopped
+    tty: true
+    expose:
+      - ${DB_PORT}
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    networks:
+      - trivago_backend
+    volumes:
+      - trivago_dbdata:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/my.cnf
+
+networks:
+  trivago_backend:
+    driver:
+     bridge
+
+volumes:
+  trivago_dbdata:
+    driver: local

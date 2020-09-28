@@ -1,0 +1,55 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Trivago Rooms Api
+  license:
+    name: MIT
+servers:
+  - url: https://rooms.trivago.com/v1
+paths:
+  /rooms:
+    get:
+      summary: Lists available rooms
+      operationId: rooms
+      tags:
+        - rooms
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/Rooms"
+
+components:
+  schemas:
+    Rooms:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            description: unique identifier of room
+            example: 1
+          hotel:
+            type: string
+            example: Hotel A
+            description: hotel room belongs to
+          rating:
+            type: integer
+            description: star rating of the hotel 
+            example: 4
+          price:
+            type: number
+            description: price of room
+            example: 10.00
+          currency: 
+            type: string
+            description: currency of price
+            example: EUR
+          advertiser:
+            type: string
+            example: advertiser_one
+            description: where the room room was pooled from
+          
